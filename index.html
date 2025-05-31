@@ -718,15 +718,23 @@ fillGallery("gallery14", items14);
     /* ... 기존 스타일 ... */
     #gallery4 .img-frame,
     #gallery14 .img-frame {
-      width: 120px;
-      height: 170px;
-      border-radius: 14px;
-      box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
+  width: 120px;
+  height: 170px;
+  border-radius: 0;
+  box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
+  display: flex;
+  align-items: flex-start;   /* 세로 상단 정렬 */
+  justify-content: center;   /* 가로 가운데 정렬 */
     }
     #gallery4 .img-frame img,
     #gallery14 .img-frame img {
-      object-fit: contain;
+      width: 95%;
+  height: 95%;
+  object-fit: contain;
+  margin: 0 auto 0 auto;     /* 상하 0, 좌우 auto = 가로 중앙정렬 */
     }
+
+    
   </style>
 
   
