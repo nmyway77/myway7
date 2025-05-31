@@ -210,10 +210,41 @@
       <textarea id="html-editor" placeholder="HTML 코드 편집"></textarea>
       <div id="html-preview"></div>
     </div>
+
+    
     <div id="screen-block-3" class="screen-block">
-      <h2>여기에 화면 3의 HTML 코드를 넣으세요</h2>
-      <img src="https://via.placeholder.com/240x120" alt="샘플이미지">
+<div id="screen-block-3" class="screen-block">
+  <div class="screen-section-label">갤러리 1</div>
+  <div class="img-grid" id="gallery11"></div>
+  <div class="screen-section-label">갤러리 2</div>
+  <div class="img-grid" id="gallery12"></div>
+  <div class="screen-section-label">갤러리 3</div>
+  <div class="img-grid" id="gallery13"></div>
+  <div class="screen-section-label">갤러리 4 (매거진)</div>
+  <div class="img-grid" id="gallery14"></div>
+</div>
+<script>
+// 화면3 갤러리용 데이터
+var items11 = [ { url: "https://naver.com", img: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" } ];
+  
+var items12 = [ { url: "https://daum.net", img: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" } ];
+  
+var items13 = [ { url: "https://youtube.com", img: "https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" } ];
+  
+var items14 = [ { url: "https://nate.com", img: "https://upload.wikimedia.org/wikipedia/commons/5/5d/Nate-logo.svg" } ];
+  
+var shadowSrc = "https://64.media.tumblr.com/f5f06009df6584ebb5539cad61f73c63/tumblr_inline_qsghz3XZRQ1r45nlo_500.png";
+
+fillGallery("gallery11", items11);
+fillGallery("gallery12", items12);
+fillGallery("gallery13", items13);
+fillGallery("gallery14", items14);
+</script>
+
     </div>
+
+
+    
     <div id="screen-block-4" class="screen-block">
       <h2>여기에 화면 4의 HTML 코드를 넣으세요</h2>
       <iframe width="340" height="192" src="https://www.youtube.com/embed/O5H5KQGuQAs" frameborder="0" allowfullscreen></iframe>
