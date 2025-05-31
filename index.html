@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ko">
 <head>
   <base target="_blank">
@@ -29,28 +29,42 @@
     /* 갤러리 스타일 */
     .img-grid {display:grid;grid-template-columns:repeat(6, 1fr);gap:28px 12px;max-width:1050px;margin:40px auto 30px auto;padding:0 6px;background:#fff;}
     .img-cell {background:#fff;display:flex;flex-direction:column;align-items:center;padding:0;}
-    .img-frame {
-      width: 150px; height: 97px;
-      background: #fff;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 0;         /* 둥근 모서리 제거 → 각지게 */
-      overflow: hidden;
-      border: none; box-sizing: border-box;
-      margin-bottom: 0;
-      box-shadow: 0 6px 18px 0 rgba(60,60,140,0.08); /* 입체감 그림자 유지 */
-      position: relative;
-    }
-    .img-frame img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-      display: block; background: #fff;
-    }
-    #gallery4 .img-frame {
-      width: 120px; height: 170px;
-      border-radius: 0;        /* 매거진도 각지게 */
-      box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
-    }
-    #gallery4 .img-frame img { object-fit: contain; }
+.img-frame {
+  width: 150px; height: 97px;
+  background: #fff;
+  display: flex;
+  align-items: flex-start;      /* ← 세로 상단 정렬로 변경 */
+  justify-content: center;
+  border-radius: 0;
+  overflow: hidden;
+  border: none; box-sizing: border-box;
+  margin-bottom: 0;
+  box-shadow: 0 6px 18px 0 rgba(60,60,140,0.08);
+  position: relative;
+}
+.img-frame img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  display: block;
+  background: #fff;
+  margin: 0 auto 0 auto;        /* ← 상단 0, 좌우 auto(가로 가운데) */
+}
+#gallery4 .img-frame {
+  width: 120px;
+  height: 170px;
+  border-radius: 0;
+  box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
+  display: flex;
+  align-items: flex-start;   /* 세로 상단 정렬 */
+  justify-content: center;   /* 가로 가운데 정렬 */
+}
+#gallery4 .img-frame img {
+  width: 95%;
+  height: 95%;
+  object-fit: contain;
+  margin: 0 auto 0 auto;     /* 상하 0, 좌우 auto = 가로 중앙정렬 */
+}
     .shadow-line {
       width: 82%;
       height: 14px;
