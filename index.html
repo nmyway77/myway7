@@ -696,21 +696,7 @@
 
 <script>
 
-    body { ... }
-  .header-wrap { ... }
-  .img-frame { ... }
-  /* gallery4, gallery14 모두 적용! */
-  #gallery4 .img-frame,
-  #gallery14 .img-frame {
-    width: 120px;
-    height: 170px;
-    border-radius: 14px;
-    box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
-  }
-  #gallery4 .img-frame img,
-  #gallery14 .img-frame img {
-    object-fit: contain;
-  }
+
 // 화면3 갤러리용 데이터
 var items11 = [ { url: "https://naver.com", img: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" } ];
   
@@ -727,6 +713,21 @@ fillGallery("gallery12", items12);
 fillGallery("gallery13", items13);
 fillGallery("gallery14", items14);
 </script>
+
+  <style>
+    /* ... 기존 스타일 ... */
+    #gallery4 .img-frame,
+    #gallery14 .img-frame {
+      width: 120px;
+      height: 170px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px 0 rgba(60,60,140,0.10);
+    }
+    #gallery4 .img-frame img,
+    #gallery14 .img-frame img {
+      object-fit: contain;
+    }
+  </style>
 
   
 </body>
