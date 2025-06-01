@@ -228,8 +228,439 @@
 
     
     <div id="screen-block-4" class="screen-block">
-      <h2>여기에 화면 4의 HTML 코드를 넣으세요</h2>
-      <iframe width="340" height="192" src="https://www.youtube.com/embed/O5H5KQGuQAs" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+      
+    <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>볼륨 북마크 웹에디터</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <style>
+    html, body {margin:0; padding:0; height:100%; width:100%;}
+    body {
+      font-family: 'Pretendard','Segoe UI','맑은 고딕',Arial,sans-serif;
+      min-height:100vh;
+      background: linear-gradient(130deg, #f6f7fb 0%, #f2f7fa 100%);
+    }
+    .wrap {
+      width:100vw; min-height:100vh; margin:0; padding:0 0 32px 0; box-sizing:border-box;
+      background:transparent; border-radius:0; box-shadow:none;
+    }
+    .topbar {
+      width:100vw; display:flex; justify-content:space-between; align-items:center;
+      padding:20px 4vw 2px 3vw; box-sizing:border-box;
+    }
+    h2 {
+      margin:0; font-size:1.25rem; font-weight:800;
+      color:#32277a; letter-spacing:0.5px;
+    }
+    .toolbar {
+      display: flex; gap:4px; align-items:center; justify-content: flex-end;
+    }
+    .toolbar button {
+      border:none; background: linear-gradient(95deg,#f7eaff 70%,#e1e6ff 100%);
+      color:#6a58e0; font-size:1.02rem;
+      padding:7px 16px 7px 12px; border-radius:10px; font-weight:700; cursor:pointer;
+      transition:background .17s,color .14s, box-shadow .18s;
+      min-width: 32px; min-height: 36px; display:flex; align-items:center; gap:6px;
+      box-shadow:0 2px 10px 0 rgba(92,88,200,0.05);
+      outline:none; border:1.5px solid #eceaff;
+    }
+    .toolbar button:hover {
+      background: linear-gradient(93deg,#7e70e9 0%,#ffe8bb 90%);
+      color:#fff; border-color:#bdbafc;
+      box-shadow:0 4px 16px 0 rgba(142,98,254,0.11);
+    }
+    .toolbar .icon {
+      font-size:1.22em; display:inline-block;
+      margin-bottom:2px;
+    }
+    .category-row { display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:0;}
+    .category-tabs { display: flex; justify-content: center; margin: 10px 0 18px 0; gap:5px;}
+    .category-tab {
+      flex: 1 1 0; min-width:54px; text-align:center; cursor:pointer; padding:8px 0;
+      font-weight:600; font-size:1.05rem; border-radius:12px; margin:0 2px;
+      background: #f6f6fa; color: #444; transition: all .17s;
+      border: none;
+    }
+    .category-tab.active {
+      background: linear-gradient(90deg,#504aea 30%,#f5d37d 100%);
+      color:#fff;
+      font-weight:800;
+      box-shadow: 0 1.5px 7px rgba(80,70,190,0.08);
+    }
+    .cat-edit-btn {
+      background:#efe4fb; color:#6551b9; border:none;
+      border-radius:8px; padding:7px 13px; font-size:0.93rem;
+      font-weight:600; cursor:pointer; margin-left:3px; transition:background .17s;
+      min-width:34px;
+    }
+    .cat-edit-btn:hover { background:#d8cdfa;}
+    /* --- 모달 공통 --- */
+    .modal-bg {
+      display:none; position:fixed; left:0;top:0; right:0;bottom:0; z-index:99;
+      background:rgba(64,54,74,0.15); backdrop-filter:blur(1.5px);
+      animation: modalbgfade 0.18s;
+    }
+    @keyframes modalbgfade {
+      from { background:rgba(64,54,74,0); }
+      to { background:rgba(64,54,74,0.15);}
+    }
+    .modal, .cat-edit-modal {
+      position: absolute; left:50%; top:32%; transform:translate(-50%,-50%);
+      background: #fff; border-radius: 18px; box-shadow: 0 7px 32px 0 rgba(50,30,120,0.10);
+      padding: 32px 28px 26px 28px; max-width: 97vw; min-width: 260px; width: 370px;
+      display: flex; flex-direction: column; gap: 10px; animation: modalpop .18s;
+    }
+    @keyframes modalpop {
+      from { opacity:0; transform:translate(-50%,-30%) scale(.94);}
+      to   { opacity:1; transform:translate(-50%,-50%) scale(1);}
+    }
+    .modal label, .cat-edit-modal label {
+      color: #443688; font-weight: 700; margin-bottom: 2px; font-size: 1.04rem;
+    }
+    .modal input, .modal select, .cat-edit-modal input, .cat-edit-modal select {
+      width: 100%; padding: 11px 8px; border-radius: 8px; border: 1.2px solid #bcb4db;
+      font-size: 1.06rem; margin-bottom: 13px; box-sizing:border-box;
+      background: #f7f6fc;
+      font-family: inherit;
+    }
+    .modal .modal-btns, .cat-edit-modal .modal-btns {
+      display: flex; gap: 9px; margin-top: 6px;
+    }
+    .modal .modal-btns button, .cat-edit-modal .modal-btns button {
+      flex: 1; font-size: 1.07rem; padding: 12px 0; border-radius: 9px; border: none; cursor: pointer; font-weight: 700;
+      background: #eceafd; color: #322488; transition: background .16s,color .14s;
+    }
+    .modal .modal-btns .ok-btn, .cat-edit-modal .modal-btns .ok-btn { background: #4e44e9; color: #fff;}
+    .modal .modal-btns .ok-btn:hover, .cat-edit-modal .modal-btns .ok-btn:hover { background: #6551b9;}
+    .modal .modal-btns .cancel-btn, .cat-edit-modal .modal-btns .cancel-btn { background: #e4e4ea; color: #444;}
+    .modal .modal-btns .cancel-btn:hover, .cat-edit-modal .modal-btns .cancel-btn:hover { background: #f7f7fa;}
+    .cat-edit-modal-bg { display:none; position:fixed; left:0;top:0; right:0;bottom:0; background:rgba(32,20,44,0.13); z-index:99; }
+    .cat-edit-modal {top:32%;}
+    .cat-list-edit {margin:0; padding:0;}
+    .cat-list-edit li {
+      list-style:none; display:flex; align-items:center; gap:7px; margin:8px 0; padding:0;
+      font-size:1.05rem;
+    }
+    .cat-list-edit input[type="text"] {
+      font-size:1.04rem; padding:7px 7px; border-radius:7px; border:1.2px solid #bcb4db;
+      min-width:64px; width:95px; max-width:160px;
+      background:#f7f6fc;
+      font-family:inherit;
+    }
+    .cat-list-edit .cat-del-btn {
+      background:#ffdbe3; color:#b8263b; border:none; border-radius:7px;
+      padding:5px 12px; font-size:0.98rem; cursor:pointer; font-weight:600;
+      opacity:.82; transition:background .15s;
+    }
+    .cat-list-edit .cat-del-btn:disabled { opacity:.35; cursor:not-allowed;}
+    .cat-edit-modal .cat-add-row {display:flex; gap:6px; margin-top:17px;}
+    .cat-edit-modal .cat-add-row input {flex:1; font-size:1rem; padding:7px 8px; border-radius:7px; border:1.2px solid #bcb4db;}
+    .cat-edit-modal .cat-add-row button {
+      background:#faf48f; color:#655a01; border:none; border-radius:7px;
+      padding:5px 16px; font-size:0.99rem; cursor:pointer; font-weight:600;
+      transition:background .17s;
+    }
+    .cat-edit-modal .cat-add-row button:hover { background:#ffe267;}
+    .bookmark-list {margin:0; padding:0 4vw;}
+    .bookmark-item {
+      list-style:none; padding:11px 0 10px 6px; margin:0; background:transparent;
+      display:flex; align-items:center; border-radius:9px;
+      border:none; box-shadow:none; border-bottom:1.3px solid #f0f0f7;
+      transition:background 0.17s;
+    }
+    .bookmark-item:last-child {border-bottom:none;}
+    .bookmark-link {
+      font-family: 'Segoe UI','맑은 고딕',Arial,sans-serif;
+      font-size: 1.21rem; font-weight: 900; letter-spacing:1.4px;
+      color: #3424ae; text-decoration: none;
+      background: linear-gradient(97deg,#ffe086 10%,#605cf2 70%);
+      background-clip: text; -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 1.5px 2.5px 7px #e7c06d32, 0 1px 0 #d3e6ff28;
+      filter: drop-shadow(0 1px 2px #e1dbe9);
+      margin-right: 9px; transition: transform .16s;
+      user-select:none;
+    }
+    .bookmark-link:hover { transform:scale(1.06);}
+    .bookmark-url {
+      font-size:.95rem; color:#9694c0; margin-left:auto;
+      max-width:150px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;
+      background:none; border-radius:8px; padding:2px 6px;
+      user-select:all;
+    }
+    @media (max-width:700px) {
+      .modal, .cat-edit-modal { width:96vw; min-width:0; padding:19px 5vw 19px 5vw;}
+    }
+    @media (max-width:600px) {
+      .bookmark-list {padding:0 1vw;}
+      h2 {font-size:1.01rem;}
+      .topbar {padding:13px 1vw 2px 2vw;}
+      .modal, .cat-edit-modal {padding:17px 2vw 19px 2vw;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h2>볼륨 북마크</h2>
+      <div class="toolbar">
+        <button id="addBtn" type="button" title="추가"><span class="icon">＋</span><span>추가</span></button>
+        <button id="exportBtn" type="button" title="내보내기"><span class="icon">⬇️</span><span>내보내기</span></button>
+        <button id="importBtn" type="button" title="가져오기"><span class="icon">⬆️</span><span>가져오기</span></button>
+        <input type="file" id="fileInput" style="display:none">
+      </div>
+    </div>
+    <div class="category-row">
+      <div class="category-tabs" id="categoryTabs"></div>
+      <button class="cat-edit-btn" id="catEditBtn">편집</button>
+    </div>
+    <ul class="bookmark-list" id="bookmarkList"></ul>
+  </div>
+  <!-- 카테고리 편집 모달 -->
+  <div class="cat-edit-modal-bg modal-bg" id="catEditModalBg">
+    <div class="cat-edit-modal">
+      <h3 style="color:#6551b9; margin-top:0;">카테고리 편집</h3>
+      <ul class="cat-list-edit" id="catEditList"></ul>
+      <div class="cat-add-row">
+        <input type="text" id="catAddInput" maxlength="14" placeholder="새 카테고리명">
+        <button id="catAddBtn" type="button">추가</button>
+      </div>
+      <div class="modal-btns">
+        <button class="ok-btn" id="catEditOk" type="button">확인</button>
+        <button class="cancel-btn" id="catEditCancel" type="button">취소</button>
+      </div>
+    </div>
+  </div>
+  <!-- 북마크 추가 모달 -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal" id="modal">
+      <label>디렉토리
+        <select id="dirInput"></select>
+      </label>
+      <label>글자(표시 제목)
+        <input type="text" id="textInput" maxlength="24">
+      </label>
+      <label>링크 주소
+        <input type="url" id="urlInput" placeholder="https://로 시작">
+      </label>
+      <div class="modal-btns">
+        <button class="ok-btn" id="okBtn" type="button">마침</button>
+        <button class="cancel-btn" id="cancelBtn" type="button">취소</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- State ---
+    let categories = [];
+    let data = [];
+    let currentCategory = '';
+
+    const STORAGE_KEY = 'volume_bookmark_editor_v4';
+
+    // 저장/불러오기 (LocalStorage)
+    function saveAll() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({categories,data,currentCategory}));
+    }
+    function loadAll() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if(saved) {
+        try {
+          const obj = JSON.parse(saved);
+          if(obj.categories && Array.isArray(obj.categories)) {
+            categories = obj.categories;
+            data = Array.isArray(obj.data) ? obj.data : [];
+            currentCategory = categories.includes(obj.currentCategory) ? obj.currentCategory : categories[0];
+            return;
+          }
+        } catch {}
+      }
+      categories = ['뉴스','공부','쇼핑','툴','기타'];
+      data = [];
+      currentCategory = categories[0];
+    }
+
+    // 카테고리 탭
+    const categoryTabs = document.getElementById('categoryTabs');
+    function renderTabs() {
+      categoryTabs.innerHTML = '';
+      categories.forEach(cat => {
+        const tab = document.createElement('div');
+        tab.className = 'category-tab' + (cat === currentCategory ? ' active':'');
+        tab.innerText = cat;
+        tab.onclick = () => { currentCategory = cat; renderList(); renderTabs(); saveAll(); };
+        categoryTabs.appendChild(tab);
+      });
+    }
+
+    // 북마크 목록
+    const bookmarkList = document.getElementById('bookmarkList');
+    function renderList() {
+      bookmarkList.innerHTML = '';
+      data.filter(x=>x.dir===currentCategory).forEach(item=>{
+        const li = document.createElement('li');
+        li.className = 'bookmark-item';
+        li.setAttribute('data-id', data.indexOf(item));
+        li.innerHTML = `<a class="bookmark-link" href="${item.url}" target="_blank" rel="noopener">${item.text}</a>
+                        <span class="bookmark-url">${item.url.replace(/^https?:\/\//,'')}</span>`;
+        bookmarkList.appendChild(li);
+      });
+      // 드래그 정렬
+      Sortable.create(bookmarkList, {
+        animation: 180,
+        onEnd: function (evt) {
+          const list = data.filter(x=>x.dir===currentCategory);
+          const fullIdxs = list.map(i=>data.indexOf(i));
+          const [moved] = fullIdxs.splice(evt.oldIndex, 1);
+          fullIdxs.splice(evt.newIndex, 0, moved);
+          const newOrder = [];
+          categories.forEach(cat=>{
+            const items = data.filter(x=>x.dir===cat);
+            if(cat===currentCategory){
+              fullIdxs.forEach(i=>newOrder.push(data[i]));
+            } else {
+              items.forEach(i=>newOrder.push(i));
+            }
+          });
+          data = newOrder;
+          renderList(); saveAll();
+        }
+      });
+    }
+
+    // 북마크 추가 모달
+    const modalBg = document.getElementById('modalBg');
+    function renderDirOptions() {
+      const sel = document.getElementById('dirInput');
+      sel.innerHTML = '';
+      categories.forEach(cat=>{
+        const opt = document.createElement('option');
+        opt.value = cat; opt.innerText = cat;
+        sel.appendChild(opt);
+      });
+    }
+    function openModal() { modalBg.style.display = 'block'; }
+    function closeModal() { modalBg.style.display = 'none'; }
+    document.getElementById('addBtn').onclick = () => {
+      renderDirOptions();
+      document.getElementById('dirInput').value = currentCategory;
+      document.getElementById('textInput').value = '';
+      document.getElementById('urlInput').value = '';
+      openModal();
+    };
+    document.getElementById('cancelBtn').onclick = closeModal;
+    document.getElementById('okBtn').onclick = function() {
+      const dir = document.getElementById('dirInput').value;
+      const text = document.getElementById('textInput').value.trim();
+      const url = document.getElementById('urlInput').value.trim();
+      if (!dir || !text || !url.match(/^https?:\/\//)) { alert('카테고리, 제목, 링크를 올바르게 입력하세요!'); return; }
+      data.push({dir, text, url});
+      closeModal();
+      renderList(); saveAll();
+    };
+    modalBg.onclick = function(e) { if(e.target===modalBg) closeModal(); };
+
+    // 내보내기 / 가져오기
+    document.getElementById('exportBtn').onclick = () => {
+      const blob = new Blob([JSON.stringify({categories,data},null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = "bookmarks.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+    document.getElementById('importBtn').onclick = () => {
+      document.getElementById('fileInput').click();
+    };
+    document.getElementById('fileInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const obj = JSON.parse(evt.target.result);
+          if(obj.categories && Array.isArray(obj.categories) && obj.data && Array.isArray(obj.data)) {
+            categories = obj.categories;
+            data = obj.data.filter(x=>categories.includes(x.dir));
+            currentCategory = categories[0];
+            renderTabs(); renderList(); saveAll();
+          } else alert("JSON 구조가 올바르지 않습니다.");
+        } catch { alert("불러오기에 실패했습니다."); }
+      };
+      reader.readAsText(file);
+    };
+
+    // 카테고리 편집 모달
+    const catEditBtn = document.getElementById('catEditBtn');
+    const catEditModalBg = document.getElementById('catEditModalBg');
+    const catEditList = document.getElementById('catEditList');
+    const catAddInput = document.getElementById('catAddInput');
+    let editCats = [];
+
+    function openCatEditModal() {
+      editCats = [...categories];
+      renderCatEditList();
+      catAddInput.value = '';
+      catEditModalBg.style.display = 'block';
+    }
+    function closeCatEditModal() { catEditModalBg.style.display = 'none'; }
+    catEditBtn.onclick = openCatEditModal;
+    document.getElementById('catEditCancel').onclick = closeCatEditModal;
+    document.getElementById('catEditOk').onclick = function() {
+      categories = editCats.filter(c=>!!c.trim());
+      data = data.filter(x=>categories.includes(x.dir));
+      if (!categories.includes(currentCategory)) currentCategory = categories[0] || '';
+      renderTabs(); renderList(); closeCatEditModal(); saveAll();
+    };
+    function renderCatEditList() {
+      catEditList.innerHTML = '';
+      editCats.forEach((cat, i) => {
+        const li = document.createElement('li');
+        const input = document.createElement('input');
+        input.type = "text";
+        input.value = cat;
+        input.maxLength = 14;
+        input.oninput = e => editCats[i]=e.target.value;
+        li.appendChild(input);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'cat-del-btn';
+        delBtn.textContent = "삭제";
+        delBtn.disabled = data.some(x=>x.dir===cat) || editCats.length<=1;
+        delBtn.onclick = ()=>{ editCats.splice(i,1); renderCatEditList(); };
+        li.appendChild(delBtn);
+        catEditList.appendChild(li);
+      });
+    }
+    document.getElementById('catAddBtn').onclick = function() {
+      let val = catAddInput.value.trim();
+      if(!val) return;
+      if(editCats.includes(val)) { alert('이미 존재하는 이름입니다!'); return; }
+      editCats.push(val);
+      catAddInput.value = '';
+      renderCatEditList();
+    };
+    catEditModalBg.onclick = function(e) { if(e.target===catEditModalBg) closeCatEditModal(); };
+
+    // 첫 화면 렌더링/불러오기
+    loadAll();
+    renderTabs();
+    renderList();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+      
     </div>
     <div id="screen-block-5" class="screen-block">
       <h2>여기에 화면 5의 HTML 코드를 넣으세요</h2>
