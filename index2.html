@@ -595,6 +595,263 @@
 
 
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <style>
+    body {margin:0; padding:0; background:#fff; font-family:'Segoe UI','맑은 고딕','NanumGothic',Arial,sans-serif;}
+    #controls5 { position: fixed; top: 20px; right: 10px; display: flex; gap: 8px; z-index: 100;}
+    #controls5 button { padding: 6px 10px; background: #3C3C8C; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer;}
+    #controls5 button:nth-child(2) { background: #007bff; }
+    #controls5 button:nth-child(3) { background: #ffc107; color: #000; }
+    #modal-overlay5 { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200;}
+    #modal5 { background: #fff; padding: 20px; border-radius: 6px; width: 320px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    #modal5 h3 { margin-bottom: 10px; font-size: 18px; }
+    #modal5 input { width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;}
+    .auto-thumb-btn5 { background: #eee; color: #333; border: 1px solid #aaa; border-radius: 4px; padding: 6px 10px; font-size: 13px; margin-bottom: 10px; margin-right: 5px; cursor: pointer; display: inline-block;}
+    .actions5 { text-align: right; }
+    .actions5 button { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; margin-left: 8px; font-size: 14px;}
+    .save-btn5 { background: #28a745; color: #fff; }
+    .cancel-btn5 { background: #dc3545; color: #fff; }
+    #media-grid5 { column-count: 5; column-gap: 10px; margin: 60px auto 20px; width: 100%; max-width: 1400px;}
+    .grid-item5 { break-inside: avoid; margin-bottom: 10px; position: relative; background:#fff; box-shadow: 0 1px 6px #d0d0ff44;}
+    .grid-item5 img { width: 100%; height: auto; display: block; border-radius: 8px; cursor: pointer;}
+    .edit-btn5 { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); border: none; color: #fff; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 12px;}
+    .desc-label5 { position: absolute; left: 0; right: 0; bottom: 13%; padding: 2px 7px; color: #35334a; font-size: 12px; text-align: center; background: rgba(255,255,255,0.82); border-radius: 8px; margin: 0 8px; pointer-events: none; font-weight: 500;}
+    @media (max-width:1100px) {#media-grid5{column-count:4;}}
+    @media (max-width:800px)  {#media-grid5{column-count:3;}}
+    @media (max-width:600px)  {#media-grid5{column-count:2;}}
+    @media (max-width:420px)  {#media-grid5{column-count:1;}}
+    #html-editor5, #html-preview5 { border-color: white;}
+    #html-edit-btn5 { display: block; margin: 0; padding: 8px 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; position: relative; top: 20px;}
+    #html-editor5 { display: none; width: 100%; height: 200px; font-family: monospace; font-size: 14px; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; background: #f0f8ff; border-color: #007bff; margin-bottom: 8px;}
+    #html-preview5 { width: 100%; padding: 10px; border: 1px solid #ddd; background: white;}
+    .editor-space5 { height: 16px;}
+  </style>
+
+
+  <div id="controls5">
+    <button id="save-media-btn5">미디어 저장</button>
+    <button id="export-btn5">내보내기</button>
+    <button id="import-btn5">가져오기</button>
+    <input type="file" id="import-file5" accept="application/json" style="display:none">
+  </div>
+  <div id="media-grid5"></div>
+  <div class="editor-space5"></div>
+  <button id="html-edit-btn5">편집</button>
+  <textarea id="html-editor5" placeholder="HTML 코드 편집"></textarea>
+  <div id="html-preview5"></div>
+  <div id="modal-overlay5">
+    <div id="modal5">
+      <h3>미디어 저장</h3>
+      <input type="text" id="img-url5" placeholder="사진 URL 입력" autofocus>
+      <button type="button" class="auto-thumb-btn5" id="auto-thumb-btn5">썸네일 자동찾기</button>
+      <input type="text" id="link-url5" placeholder="연결 링크 입력">
+      <input type="text" id="media-desc5" placeholder="설명글 (예: 여행중)">
+      <input type="text" id="media-folder5" placeholder="폴더/디렉토리 (예: 여행)">
+      <div class="actions5">
+        <button class="cancel-btn5">취소</button>
+        <button class="save-btn5">저장</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // 완전 독립적인 localStorage 키
+    const STORAGE_KEY5 = 'mediaList5_grid';
+    const HTML_KEY5 = 'mediaHtmlContent5_grid';
+
+    // 썸네일 자동추출 함수
+    function extractYouTubeId5(url) {
+      const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([a-zA-Z0-9_-]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    // 요소 연결
+    const saveBtn5 = document.getElementById('save-media-btn5'),
+      exportBtn5 = document.getElementById('export-btn5'),
+      importBtn5 = document.getElementById('import-btn5'),
+      importFile5 = document.getElementById('import-file5'),
+      overlay5 = document.getElementById('modal-overlay5'),
+      cancelBtn5 = document.querySelector('.cancel-btn5'),
+      confirmBtn5 = document.querySelector('.save-btn5'),
+      imgInput5 = document.getElementById('img-url5'),
+      linkInput5 = document.getElementById('link-url5'),
+      descInput5 = document.getElementById('media-desc5'),
+      folderInput5 = document.getElementById('media-folder5'),
+      gridContainer5 = document.getElementById('media-grid5'),
+      autoThumbBtn5 = document.getElementById('auto-thumb-btn5');
+    let editingIndex5 = null;
+
+    // 모달 열기
+    saveBtn5.onclick = () => openModal5();
+    function openModal5(item, idx) {
+      if (item) {
+        imgInput5.value = item.imgUrl || "";
+        linkInput5.value = item.linkUrl || "";
+        descInput5.value = item.desc || '';
+        folderInput5.value = item.folder || '';
+        confirmBtn5.textContent = '수정';
+        editingIndex5 = idx;
+      } else {
+        imgInput5.value = '';
+        linkInput5.value = '';
+        descInput5.value = '';
+        folderInput5.value = '';
+        confirmBtn5.textContent = '저장';
+        editingIndex5 = null;
+      }
+      overlay5.style.display = 'flex';
+      imgInput5.focus();
+    }
+    cancelBtn5.onclick = () => { overlay5.style.display = 'none'; editingIndex5 = null; };
+
+    autoThumbBtn5.onclick = function() {
+      const linkVal = linkInput5.value.trim() || imgInput5.value.trim();
+      const youtubeId = extractYouTubeId5(linkVal);
+      if (youtubeId) {
+        imgInput5.value = `https://img.youtube.com/vi/${youtubeId}/0.jpg`;
+        alert('유튜브 썸네일이 자동으로 입력되었습니다!');
+      } else {
+        alert('유튜브 영상 링크를 입력해 주세요.');
+      }
+    };
+
+    confirmBtn5.onclick = () => {
+      const iurl = imgInput5.value.trim();
+      if (!iurl) { alert('사진 URL을 입력해주세요.'); imgInput5.focus(); return; }
+      let lurl = linkInput5.value.trim();
+      if (!lurl) { alert('연결 링크를 입력해주세요.'); linkInput5.focus(); return; }
+      if (!/^https?:\/\//i.test(lurl)) lurl = 'https://' + lurl;
+      const desc = descInput5.value.trim();
+      const folder = folderInput5.value.trim();
+      let list = JSON.parse(localStorage.getItem(STORAGE_KEY5) || '[]');
+      const data = { imgUrl: iurl, linkUrl: lurl, desc, folder };
+      if (editingIndex5 !== null) list[editingIndex5] = data;
+      else list.push(data);
+      localStorage.setItem(STORAGE_KEY5, JSON.stringify(list));
+      overlay5.style.display = 'none';
+      renderGrid5();
+      editingIndex5 = null;
+    };
+
+    exportBtn5.onclick = () => {
+      const mediaList = JSON.parse(localStorage.getItem(STORAGE_KEY5) || '[]');
+      const htmlContent = localStorage.getItem(HTML_KEY5) || '';
+      const data = { mediaList, htmlContent };
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mediaList5_grid.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    importBtn5.onclick = () => importFile5.click();
+    importFile5.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (Array.isArray(data.mediaList)) {
+            localStorage.setItem(STORAGE_KEY5, JSON.stringify(data.mediaList));
+            renderGrid5();
+          }
+          if ('htmlContent' in data) {
+            localStorage.setItem(HTML_KEY5, data.htmlContent);
+            showHtmlContent5();
+          }
+          alert('데이터가 복원되었습니다.');
+        } catch {
+          alert('파일 읽기 중 오류가 발생했습니다.');
+        }
+      };
+      reader.readAsText(file);
+      importFile5.value = null;
+    };
+
+    function renderGrid5() {
+      let list = JSON.parse(localStorage.getItem(STORAGE_KEY5) || '[]');
+      gridContainer5.innerHTML = '';
+      list.slice(0, 500).forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'grid-item5';
+        card.style.position = 'relative';
+        const img = document.createElement('img');
+        img.src = item.imgUrl;
+        img.alt = '';
+        img.onerror = function() {
+          this.src = 'https://via.placeholder.com/300x180/ccc/fff?text=Image+Not+Found';
+        }
+        img.addEventListener('click', () => window.open(item.linkUrl, '_blank'));
+        if(item.desc) {
+          const desc = document.createElement('div');
+          desc.className = 'desc-label5';
+          desc.textContent = item.desc;
+          card.appendChild(desc);
+        }
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn5';
+        editBtn.textContent = '수정';
+        editBtn.addEventListener('click', e => { e.stopPropagation(); openModal5(item, idx); });
+        card.append(img, editBtn);
+        gridContainer5.append(card);
+      });
+
+      // 드래그 정렬
+      Sortable.create(gridContainer5, {
+        animation: 150,
+        onEnd: function (evt) {
+          let allList = JSON.parse(localStorage.getItem(STORAGE_KEY5) || '[]');
+          const [moved] = allList.splice(evt.oldIndex, 1);
+          allList.splice(evt.newIndex, 0, moved);
+          localStorage.setItem(STORAGE_KEY5, JSON.stringify(allList));
+          renderGrid5();
+        }
+      });
+    }
+
+    // HTML 편집기 로직 (화면5 전용)
+    const htmlEditBtn5 = document.getElementById('html-edit-btn5');
+    const htmlEditor5 = document.getElementById('html-editor5');
+    const htmlPreview5 = document.getElementById('html-preview5');
+    let htmlEditing5 = false;
+
+    function showHtmlContent5() {
+      const savedHtml = localStorage.getItem(HTML_KEY5) || '';
+      htmlPreview5.innerHTML = savedHtml;
+      htmlEditor5.value = savedHtml;
+      htmlEditor5.style.display = 'none';
+      htmlPreview5.style.display = 'block';
+      htmlEditBtn5.textContent = '편집';
+      htmlEditing5 = false;
+    }
+
+    htmlEditBtn5.onclick = () => {
+      htmlEditing5 = !htmlEditing5;
+      if (htmlEditing5) {
+        htmlEditor5.style.display = 'block';
+        htmlPreview5.style.display = 'none';
+        htmlEditBtn5.textContent = '마침';
+        htmlEditor5.value = htmlPreview5.innerHTML;
+      } else {
+        htmlPreview5.innerHTML = htmlEditor5.value;
+        htmlEditor5.style.display = 'none';
+        htmlPreview5.style.display = 'block';
+        htmlEditBtn5.textContent = '편집';
+        localStorage.setItem(HTML_KEY5, htmlPreview5.innerHTML);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderGrid5();
+      showHtmlContent5();
+    });
+  </script>
+
+     
+
 
 
     </div>
