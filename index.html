@@ -115,6 +115,51 @@
     .screen-block[data-controls="on"].active ~ #controls,
     #controls.active { display: flex !important; }
   </style>
+
+<style>
+/* 화면2(그림그리드)에만 적용되는 스타일 */
+#screen-block-2 .list-row {
+  float: left;
+  width: 150px; height: 97px;
+  background: #f2f4f7;
+  margin: 0 18px 42px 0;
+  box-sizing: border-box;
+  position: relative;
+}
+#screen-block-2 .list-row:last-child { margin-right: 0; }
+#screen-block-2 .imgframe {
+  width: 100%; height: 100%;
+  background: #fff;
+  position: relative;
+  box-sizing: border-box;
+  z-index: 0;
+  border-radius: 0;
+  box-shadow: 0 1.5px 6px 0 rgba(90,90,130,0.11);
+  overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: center;
+}
+#screen-block-2 .img-wrap { position: relative; height: 100%; width: 100%; overflow: hidden; margin:0; padding:0;}
+#screen-block-2 .img-item { position: relative; width: 100%; height: 100%; overflow: hidden;}
+#screen-block-2 .img-item img {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; background: #fff; margin: 0; border: none; padding: 0;
+}
+#screen-block-2 .shadow-line { text-align: center; margin: 0; padding: 0; max-width: 100%; overflow: hidden !important; vertical-align: top;}
+#screen-block-2 .shadow-line img { display: block; margin: 0 auto; width: 95%; height: auto; pointer-events: none; user-select: none; }
+/* 매거진(갤4)은 세로만 다르게 */
+#screen-block-2 .list-row.magazine { width: 120px; height: 170px; }
+#screen-block-2 .img-wrap.magazine { height: 100%; }
+#screen-block-2 .img-item.magazine { height: 100%; }
+.clearfix::after { content: ""; display: table; clear: both; }
+@media (max-width:900px) {
+  #screen-block-2 .list-row { width:45vw; height:28vw; min-width:100px; min-height:60px;}
+  #screen-block-2 .list-row.magazine { width:31vw; height:44vw; min-width:65px; min-height:85px;}
+}
+</style>
+
+
+
+ 
 </head>
 <body>
   <div class="header-wrap">
