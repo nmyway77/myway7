@@ -168,6 +168,20 @@
       frame.style.overflow = 'hidden';
       frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+
+  document.getElementById('screen-frame').onload = function() {
+    try {
+      this.style.height = this.contentWindow.document.body.scrollHeight + 'px';
+    } catch(e) {
+      this.style.height = this.style.minHeight || '1100px';
+    }
+  };
+
+
+
+
+   
   </script>
 </body>
 </html>
